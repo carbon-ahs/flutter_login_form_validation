@@ -15,62 +15,78 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            children: [
-              Image.asset('assets/images/signin_balls.png'),
-              const Text(
-                'Sign in.',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 50,
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  state.error,
                 ),
               ),
-              const SizedBox(height: 50),
-              const SocialButton(
-                  iconPath: 'assets/svgs/g_logo.svg',
-                  label: 'Continue with Google'),
-              const SizedBox(height: 20),
-              const SocialButton(
-                iconPath: 'assets/svgs/f_logo.svg',
-                label: 'Continue with Facebook',
-                horizontalPadding: 90,
+            );
+          }
+        },
+        builder: (BuildContext context, AuthState state) {
+          return SingleChildScrollView(
+            child: Center(
+              child: Column(
+                children: [
+                  Image.asset('assets/images/signin_balls.png'),
+                  const Text(
+                    'Sign in.',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 50,
+                    ),
+                  ),
+                  const SizedBox(height: 50),
+                  const SocialButton(
+                      iconPath: 'assets/svgs/g_logo.svg',
+                      label: 'Continue with Google'),
+                  const SizedBox(height: 20),
+                  const SocialButton(
+                    iconPath: 'assets/svgs/f_logo.svg',
+                    label: 'Continue with Facebook',
+                    horizontalPadding: 90,
+                  ),
+                  const SizedBox(height: 15),
+                  const Text(
+                    'or',
+                    style: TextStyle(
+                      fontSize: 17,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  LoginField(
+                    hintText: 'Email',
+                    controller: emailController,
+                  ),
+                  const SizedBox(height: 15),
+                  LoginField(
+                    hintText: 'Password',
+                    controller: passwordController,
+                  ),
+                  const SizedBox(height: 20),
+                  GradientButton(
+                    onPressed: () {
+                      context.read<AuthBloc>().add(
+                            AuthLoginRequested(
+                              email: emailController.text.trim(),
+                              password: passwordController.text.trim(),
+                            ),
+                          );
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(height: 15),
-              const Text(
-                'or',
-                style: TextStyle(
-                  fontSize: 17,
-                ),
-              ),
-              const SizedBox(height: 15),
-              LoginField(
-                hintText: 'Email',
-                controller: emailController,
-              ),
-              const SizedBox(height: 15),
-              LoginField(
-                hintText: 'Password',
-                controller: passwordController,
-              ),
-              const SizedBox(height: 20),
-              GradientButton(
-                onPressed: () {
-                  context.read<AuthBloc>().add(
-                        AuthLoginRequested(
-                          email: emailController.text.trim(),
-                          password: passwordController.text.trim(),
-                        ),
-                      );
-                },
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
