@@ -7,6 +7,7 @@ part 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc() : super(AuthInitial()) {
     on<AuthLoginRequested>(_onAuthLoginRequest);
+    on<AuthLogoutRequested>(_onAuthLogoutRequested);
   }
 }
 
@@ -24,15 +25,28 @@ void _onAuthLoginRequest(
       return emit(AuthFailure('Email cannot be empty'));
     }
     //password validation
-    if (password.length < 6) {
-      return emit(AuthFailure('Password must be 6 char long'));
+    if (password.length < 3) {
+      return emit(AuthFailure('Password must be 3 char long'));
     }
 
-    await Future.delayed(const Duration(seconds: 1),
-        () => emit(AuthSuccess(uid: '$email-$password')));
+    await Future.delayed(const Duration(seconds: 1), () {
+      emit(AuthSuccess(uid: '$email-$password'));
+    });
   } catch (e) {
     return emit(AuthFailure(e.toString()));
   }
 }
 
-// void _onAuthLogout
+void _onAuthLogoutRequested(
+  AuthLogoutRequested event,
+  Emitter<AuthState> emit,
+) async {
+  emit(AuthLoading());
+  try {
+    await Future.delayed(const Duration(seconds: 1), () {
+      return emit(AuthInitial());
+    });
+  } catch (e) {
+    emit(AuthFailure(e.toString()));
+  }
+}

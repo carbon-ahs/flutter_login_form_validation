@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:login_from_validation/bloc/auth_bloc.dart';
+import 'package:login_from_validation/home_screen.dart';
 import 'package:login_from_validation/widgets/gradient_button.dart';
 import 'package:login_from_validation/widgets/login_field.dart';
 import 'package:login_from_validation/widgets/social_button.dart';
@@ -30,8 +31,22 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             );
           }
+          if (state is AuthSuccess) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeScreen(),
+              ),
+              (route) => false,
+            );
+          }
         },
         builder: (BuildContext context, AuthState state) {
+          if (state is AuthLoading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
           return SingleChildScrollView(
             child: Center(
               child: Column(
@@ -81,6 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           );
                     },
+                    btnText: 'Sign in',
                   ),
                 ],
               ),
